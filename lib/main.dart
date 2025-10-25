@@ -1,37 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'pages/homework_list_page.dart';
-import 'pages/add_homework_page.dart';
-import 'blocs/homework_bloc.dart';
-import 'blocs/homework_event.dart';
-import 'blocs/homework_state.dart';
+import 'bloc/recipe_bloc.dart';
+import 'bloc/recipe_event.dart';
+import 'pages/recipe_list_page.dart';
+import 'pages/recipe_details_page.dart';
+
+final GoRouter _router = GoRouter(
+  routes: <RouteBase>[
+    GoRoute(
+      path: '/',
+      builder: (BuildContext context, GoRouterState state) {
+        return const RecipeListPage();
+      },
+      routes: [
+        GoRoute(
+          path: 'details/:id',
+          builder: (BuildContext context, GoRouterState state) {
+            return const RecipeDetailsPage();
+          },
+        ),
+      ],
+    ),
+  ],
+  initialLocation: '/',
+);
 
 void main() {
-  runApp(const HomeworkApp());
+  WidgetsFlutterBinding.ensureInitialized();
+
+  runApp(const RecipeExplorerApp());
 }
 
-class HomeworkApp extends StatelessWidget {
-  const HomeworkApp({super.key});
+class RecipeExplorerApp extends StatelessWidget {
+  const RecipeExplorerApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final GoRouter router = GoRouter(
-      routes: [
-        GoRoute(path: '/', builder: (context, state) => const HomeworkListPage()),
-        GoRoute(path: '/add', builder: (context, state) => const AddHomeworkPage()),
-      ],
-    );
-
     return BlocProvider(
-      create: (_) => HomeworkBloc(),
+      create: (context) => RecipeBloc()..add(LoadRecipes()),
       child: MaterialApp.router(
-        title: '_Homework Tracker_',
+        title: 'Recipe Explorer',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          primarySwatch: Colors.indigo,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
           useMaterial3: true,
         ),
-        routerConfig: router,
+        routerConfig: _router,
       ),
     );
   }
